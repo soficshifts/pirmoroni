@@ -10,7 +10,7 @@ The formula that gives an approximation (with hopes to improve the Gain adjustme
 
 > Noise in dB = 20log(Reading / 0.0079433) + 35
 
-There's a caveot to the formula.  Consider a 0 volt reading.  In this case the formula gives 35dB, which is obviously wrong.  This is due to a microphone's signal to noise ratio (SNR).  The [mic's datasheet](https://www.mouser.co.uk/datasheet/2/218/know_s_a0010769161_1-2271807.pdf) indicates an SNR of 59 dBA.  Based on these specs, the mic is unable to pick up sound below 35dB (94 minus 59).  
+There's a caveot to the formula.  Consider a 0 volt reading - this is undefined.  But there is always a voltage in a live system due to natural noise (air current, butterfly wings flapping, entropy).  This noise is measured as the microphone's signal to noise ratio (SNR).  The [mic's datasheet](https://www.mouser.co.uk/datasheet/2/218/know_s_a0010769161_1-2271807.pdf) indicates an SNR of 59 dBA.  Based on these specs, the mic is unable to pick up sound below 35dB (94 minus 59).  
 
 > SNR = 94dB – Self Noise
 >> so if the SNR is 59, we see
@@ -70,13 +70,13 @@ Naturally, there are many caveots here.
 - Most mic's have a frequency response, and their voltage output is not constant with frequency.  You can see the frequency response in the datasheet.  Lower and higher frequencies affect the sensitivity.
 - Amplifiers can also be affected by frequency and input voltage: they may not amplify frequency consistently, or constantly amplify input voltages.
 - Variations such as temperature, power to the mic, and other factors will affect the reading.  Tolerances on the op amp resistors will amplify the error tolerances on the gain.  
-- Since `log(0)` is undefined, the formula does not work for the trivial case (obviously, if the voltage reading is zero, there is no sound).   In fact, due to the signal to noise ratio of `59 dBA`, this indicates that with no sound, the mic will generate voltage that would equate to `35dB`, which is about `0.1mV`.  Thus, readings of 35dB or less would have to be interpreted as `0dB`.
+- Since `log(0)` is undefined, the formula does not work for the trivial case (obviously, if the voltage reading is zero, there is no sound).   In fact, due to the signal to noise ratio of `59 dBA`, this indicates that with no sound, the mic will generate (unamplified) voltage of about `11µV` (11 microvolts).  That would equate to `35dB` .  Thus, results of 35dB or less would have to be interpreted as `0dB`.
 
 ### About that number 35...hmmm
 
 The `35` in the formula was obtained by comparing readings to a smartphone app decibel meter and adjusting.  But one could ask if the adjustment was as easy as taking the reference sound level of 94dB and adjusting by the SNR of 59dbB which gives 35dB.
 
-I don't think this is normally the case, just a lucky break.  However, it is possible that the mic's amplification resistor ratio was set to produce the gain of the SNR of the mic.  This may be considered best practice for OpAmps.  
+I don't think this is normally the case, just a lucky break.  However, it is possible that the mic's amplification resistor ratio was set to produce the gain of the SNR of the mic.  
 
 Most uses of such a microphone would to be use a variable resistor so the gain can be adjusted.
 
@@ -85,5 +85,5 @@ Most uses of such a microphone would to be use a variable resistor so the gain c
 As dB is logaritmic, it does not scale linearally to voltage.  The rules of thumb are
 
 1. Doubling the voltage will increase volume by approximately 6dB.  Similarily, halving the voltage will reduce volume by 6dB.
-2. To raise the dB by 10, you will need to increase the voltage 10 times. Thus a 20dB gain in volume is 100 times the voltage.
+2. To raise the dB by 10, you will need to increase the power 10 times. Thus a 20dB gain in volume is 100 times the power.  As power is volts * amps, the formula is different than using volts only, but I've said enough.
 3. Prolonged exposure to levels above 80dB can damage hearing.  Anything over 120dB can instantly cause permanent or temporary ear damage.  Stay well away from operating jet engines.
